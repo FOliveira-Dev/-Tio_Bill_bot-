@@ -1,0 +1,222 @@
+#importando as bibliotecas
+
+import logging
+from datetime import datetime, timedelta
+from telegram import Update
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, CommandHandler
+from telegram import ChatPermissions
+import argparse
+
+# Define os argumentos
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--chat_id', required=True, help='ID do chat')
+parser.add_argument('--bot_token', required=True, help='API token do bot')
+args = parser.parse_args()
+
+# Restrições de tipos de mensagens permitidas (midia, figurinhas...)
+
+restrictions = ChatPermissions(
+    can_send_messages=False,
+    can_send_media_messages=False,
+    can_send_polls=False,
+    can_send_other_messages=False,
+    can_add_web_page_previews=False,
+    can_send_stickers=False,
+    can_change_info=False,
+    can_invite_users=False,
+    can_pin_messages=False
+)
+
+# Habilitar logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+# Lista de usuários que foram restringidos nos últimos 30 dias
+
+restricted_users = {}
+
+# Lista de palavras impróprias para monitorar
+
+bad_words = ['anus', '-nus', 'baba-ovo']
+
+# Função para verificar palavras impróprias
+
+def check_message(text):
+    for word in bad_words:
+        if word in text:
+            return True
+    return False
+
+# Função para verificar se um usuário foi restringido nos últimos 30 dias
+
+def is_restricted(user_id):
+    if user_id in restricted_users:
+        last_restriction_time = restricted_users[user_id]
+        now = datetime.now()
+        if now < last_restriction_time + timedelta(days=30):
+            return True
+    return False
+
+# Manipulador de mensagens para mensagens de monitoramento
+
+def message_handler(update: Update, context: CallbackContext):
+    message = update.effective_message
+    print(message)
+    if message.text is not None and check_message(message.text):
+        if message.from_user:
+            user_id = message.from_user.id
+            if is_restricted(user_id):
+                context.bot.ban_chat_member(chat_id=args.chat_id, user_id=user_id)
+                context.bot.send_message(chat_id=args.chat_id, text="Usuário banido por repetição de mensagem inapropriada.")
+            else:
+                # Silenciar o usuário por 24 horas
+                now = datetime.now()
+                restricted_until = now + timedelta(hours=24)
+                update.effective_chat.restrict_member(user_id, permissions=restrictions, until_date=restricted_until.timestamp())
+                restricted_users[user_id] = now
+                context.bot.send_message(chat_id='args.chat_id', text="Usuário silenciado por 24 horas devido a mensagem inapropriada.")
+        else:
+            logging.info("Mensagem sem remetente")
+
+# Função para listar as palavras impróprias monitoradas pelo bot
+def bad_words_handler(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Palavras impróprias: " + ", ".join(bad_words))
+
+# Cria o Updater com o token do bot
+updater = Updater(args.bot_token)
+
+dp = updater.dispatcher
+#importando as bibliotecas
+
+import logging
+from datetime import datetime, timedelta
+from telegram import Update
+from telegram.ext import Updater, MessageHandler, Filters, CallbackContext, CommandHandler
+from telegram import ChatPermissions
+import argparse
+
+# Define os argumentos
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--chat_id', required=True, help='ID do chat')
+parser.add_argument('--bot_token', required=True, help='API token do bot')
+args = parser.parse_args()
+
+# Restrições de tipos de mensagens permitidas (midia, figurinhas...)
+
+restrictions = ChatPermissions(
+    can_send_messages=False,
+    can_send_media_messages=False,
+    can_send_polls=False,
+    can_send_other_messages=False,
+    can_add_web_page_previews=False,
+    can_send_stickers=False,
+    can_change_info=False,
+    can_invite_users=False,
+    can_pin_messages=False
+)
+
+# Habilitar logging
+
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
+logger = logging.getLogger(__name__)
+
+# Lista de usuários que foram restringidos nos últimos 30 dias
+
+restricted_users = {}
+
+# Lista de palavras impróprias para monitorar
+
+bad_words = ['anus', '-nus', 'baba-ovo', 'babaovo', 'babaca', 'bacura', 'bagos', 'baitola', 'bebum',
+             'besta', 'bicha', 'bisca', 'bixa', 'boazuda', 'boceta', 'boco', 'boc+', 'boiola', 'bolagato',
+             'boquete', 'bolcat', 'bosseta', 'bosta', 'bostana', 'brecha', 'brexa', 'brioco', 'bronha', 'buca',
+             'buceta', 'bunda', 'bunduda', 'burra', 'burro', 'busseta', 'cachorra', 'cachorro', 'cadela', 'caga',
+             'cagado', 'cagao', 'cagona', 'canalha', 'caralho', 'casset', 'cassete', 'checheca', 'chereca', 'chibumba',
+             'chibumbo', 'chifruda', 'chifrudo', 'chota', 'chochota', 'chupada', 'chupado', 'clitoris', 'clit+ris',
+             'cocaina', 'coca-na', 'coco', 'coc+', 'corn', 'cornuda', 'cornudo', 'corrupta', 'corrupto', 'cretina',
+             'cretino', 'cruz-credo', 'cu', 'c+', 'culhao', 'culh+o', 'culh+es', 'curalho', 'cuzao', 'cuz+o', 'cuzuda',
+             'cuzudo', 'debil', 'debiloide', 'defunto', 'demonio', 'dem+nio', 'doida', 'doido', 'egua', '+gua', 'escrota',
+             'escroto', 'esporrada', 'esporrado', 'esporro', 'esp+rro', 'estupida', 'est+pida', 'estupidez', 'estupido',
+             'est+pido', 'fedida', 'fedido', 'fedor', 'fedorenta', 'feia', 'feio', 'feiosa', 'feioso', 'feioza', 'feiozo',
+             'felacao', 'fela+o', 'fenda', 'foda', 'fodao', 'fod+o', 'fode', 'fodida', 'fodido', 'fornica', 'fudendo',
+             'fudecao', 'fude+o', 'fudida', 'fudido', 'furada', 'furado', 'furao', 'fur+o', 'furnica', 'furnicar', 'furo',
+             'furona', 'gaiata', 'gaiato', 'gay', 'gonorreia', 'gonorreia', 'gosma', 'gosmenta', 'gosmento', 'grelinho',
+             'grelo', 'homosexual', 'homossexual', 'homossexual', 'idiota', 'idiotice', 'imbecil', 'iscrota', 'iscroto',
+             'japa', 'ladra', 'ladrao', 'lad+o', 'ladroeira', 'ladrona', 'lalau', 'leprosa', 'leproso', 'lesbica',
+             'l+sbica', 'macaca', 'macaco', 'machona', 'machorra', 'manguaca', 'mangua+a', 'masturba', 'meleca', 'merda',
+             'mija', 'mijada', 'mijado', 'mijo', 'mocrea', 'mocr+a', 'mocreia', 'mocr+ia', 'moleca', 'moleque', 'mondronga',
+             'mondrongo', 'naba', 'nadega', 'nojeira', 'nojenta', 'nojento', 'nojo', 'olhota', 'otaria', 'ot-ria', 'otario',
+             'ot-rio', 'paca', 'paspalha', 'paspalhao', 'paspalho', 'pau', 'peia', 'peido', 'pemba', 'penis', 'p-nis',
+             'pentelha', 'pentelho', 'perereca', 'peru', 'per+', 'pica', 'picao', 'pic+o', 'pilantra', 'piranha', 'piroca',
+             'piroco', 'piru', 'porra', 'prega', 'prostibulo', 'prost-bulo', 'prostituta', 'prostituto', 'punheta', 'punhetao',
+             'punhet+o', 'pus', 'pustula', 'p+stula', 'puta', 'puto', 'puxa-saco', 'puxasaco', 'rabao', 'rab+o', 'rabo', 'rabuda',
+             'rabudao', 'rabud+o', 'rabudo', 'rabudona', 'racha', 'rachada', 'rachadao', 'rachad+o', 'rachadinha', 'rachadinho',
+             'rachado', 'ramela', 'remela', 'retardada', 'retardado', 'ridicula', 'rid-cula', 'rola', 'rolinha', 'rosca', 'sacana',
+             'safada', 'safado', 'sapat+o', 'sapat+o', 'sifilis', 's-filis', 'siririca', 'tarada', 'tarado', 'testuda', 'tezao',
+             'tez+o', 'tezuda', 'tezudo', 'trocha', 'trolha', 'troucha', 'trouxa', 'troxa', 'vaca', 'vagabunda', 'vagabundo', 'vagina',
+             'veada', 'veadao', 'vead+o', 'veado', 'viada', 'viado', 'viadao', 'viad+o', 'xavasca', 'xerereca', 'xereca', 'xibiu',
+             'xibumba', 'xota', 'xochota', 'xoxota', 'xana', 'xaninha']
+
+# Função para verificar palavras impróprias
+
+def check_message(text):
+    for word in bad_words:
+        if word in text:
+            return True
+    return False
+
+# Função para verificar se um usuário foi restringido nos últimos 30 dias
+
+def is_restricted(user_id):
+    if user_id in restricted_users:
+        last_restriction_time = restricted_users[user_id]
+        now = datetime.now()
+        if now < last_restriction_time + timedelta(days=30):
+            return True
+    return False
+
+# Manipulador de mensagens para mensagens de monitoramento
+
+def message_handler(update: Update, context: CallbackContext):
+    message = update.effective_message
+    print(message)
+    if message.text is not None and check_message(message.text):
+        if message.from_user:
+            user_id = message.from_user.id
+            if is_restricted(user_id):
+                context.bot.ban_chat_member(chat_id=args.chat_id, user_id=user_id)
+                context.bot.send_message(chat_id=args.chat_id, text="Usuário banido por repetição de mensagem inapropriada.")
+            else:
+                # Silenciar o usuário por 24 horas
+                now = datetime.now()
+                restricted_until = now + timedelta(hours=24)
+                update.effective_chat.restrict_member(user_id, permissions=restrictions, until_date=restricted_until.timestamp())
+                restricted_users[user_id] = now
+                context.bot.send_message(chat_id='args.chat_id', text="Usuário silenciado por 24 horas devido a mensagem inapropriada.")
+        else:
+            logging.info("Mensagem sem remetente")
+
+# Função para listar as palavras impróprias monitoradas pelo bot
+def bad_words_handler(update: Update, context: CallbackContext):
+    context.bot.send_message(chat_id=update.effective_chat.id, text="Palavras impróprias: " + ", ".join(bad_words))
+
+# Cria o Updater com o token do bot
+updater = Updater(args.bot_token)
+
+dp = updater.dispatcher
+dp.add_handler(MessageHandler(Filters.text, message_handler))
+
+# Adiciona o manipulador de comandos "/badwords" ao dispatcher
+dp.add_handler(CommandHandler("badwords", bad_words_handler))
+
+# Iniciar o bot
+updater.start_polling()
+
+# Execute o bot até pressionar Ctrl-C ou o processo receber SIGINT,
+# SIGTERM ou SIGABRT. Isso deve ser usado na maioria das vezes, pois
+# start_polling() não bloqueia e interromperá o bot normalmente.
+updater.idle()
