@@ -12,7 +12,12 @@
 ##################################### by Fernando Oliveira Op07 (IguanaMan)#################################
 ############################################################################################################
 
-#APOS BAIXAR O BANCO DE DADOS E COLOCAR NA MESMA PASTA DO ARQUIVO
+# Apos baixar o banco de dados (bad_words_-SEU_CHAT_ID_AQUI.db) coloque-o na mesma pasta do arquivo "Tio_Bill_bot.py"
+e execute os passos abaixo, logo apos a criação do seu banco de dados encerre o programa e va ate na pasta onde você colocou
+copie o nome do banco de dados que foi gerado com ID do seu chat e renomeie o arquivo (bad_words_-SEU_CHAT_ID_AQUI.db) do banco
+contido aqui que ja tem varias palavras incluidas para monitorar.
+
+# Caso deseje iniciar com um banco de dados novo com suas proprias palavras para monitorar basta ignorar o passo acima e seguir daqui para baixo.
 
 
 # É necessário instalar as seguintes bibliotecas Python antes de utilizar o código:
