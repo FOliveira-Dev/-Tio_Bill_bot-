@@ -12,6 +12,8 @@
 ##################################### by Fernando Oliveira Op07 (IguanaMan)#################################
 ############################################################################################################
 
+#APOS BAIXAR O BANCO DE DADOS E COLOCAR NA MESMA PASTA DO ARQUIVO
+
 
 # É necessário instalar as seguintes bibliotecas Python antes de utilizar o código:
 
